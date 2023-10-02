@@ -223,7 +223,7 @@ impure-cmds // appleSourcePackages // chooseLibs // {
   discrete-scroll = callPackage ../os-specific/darwin/discrete-scroll { };
 
   # See doc/builders/special/darwin-builder.section.md
-  linux-builder = lib.makeOverridable ({ modules, guestSystem }:
+  linux-builder = lib.makeOverridable ({ modules, guestSystem, hostPackages }:
     let
       nixos = import ../../nixos {
         configuration = {
@@ -231,7 +231,7 @@ impure-cmds // appleSourcePackages // chooseLibs // {
             ../../nixos/modules/profiles/macos-builder.nix
           ] ++ modules;
 
-          virtualisation.host = { inherit pkgs; };
+          virtualisation.host.pkgs = hostPackages;
         };
 
         system = guestSystem;
@@ -240,6 +240,7 @@ impure-cmds // appleSourcePackages // chooseLibs // {
       nixos.config.system.build.macos-builder-installer) {
         modules = [ ];
         guestSystem = builtins.replaceStrings [ "darwin" ] [ "linux" ] stdenv.hostPlatform.system;
+        hostPackages = pkgs;
       };
 
 } // lib.optionalAttrs config.allowAliases {
